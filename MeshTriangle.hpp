@@ -78,12 +78,13 @@ public:
 	BVH* MeshBVH;
 	void sample(Intersection& inter, float& pdf) {
 		float p = getRandomNum();
-		float a = 0;
+		float area_sum = 0;
 		for (auto t : triangleList) {
-			a = a + t->getArea();
-			if (a > p * area) {
+			area_sum += t->getArea();
+			if (area_sum >= p * area) {
 				t->sample(inter, pdf);
 				pdf = 1.0f / area;
+				break;
 			}
 		}
 

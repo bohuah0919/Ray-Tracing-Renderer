@@ -19,15 +19,18 @@ public:
 	}
     void sampleLight(Intersection& inter, float& pdf) {
         float totalArea = 0;
-        float a = 0;
+        float area_sum = 0;
         float p = getRandomNum();
         for (auto obj : objList) {
             if (obj->isLight()) totalArea += obj->getArea();
         }
         for (int i = 0; i < objList.size(); i++) {
             if (objList[i]->isLight()) {
-                a += objList[i]->getArea();
-                if (a > p * totalArea) objList[i]->sample(inter, pdf);
+                area_sum += objList[i]->getArea();
+                if (area_sum >= p * totalArea) {
+                    objList[i]->sample(inter, pdf);
+                    break; 
+                }
             }
         }
     }

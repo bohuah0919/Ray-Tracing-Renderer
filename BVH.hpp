@@ -1,18 +1,20 @@
 #pragma once
 #include"Object.hpp"
 #include"Intersection.hpp"
-
+#include"Function.hpp"
 struct BVHnode {
 public:
 	BVHnode* left;
 	BVHnode* right;
 	BoundingBox aabb;
 	Object* obj;
+	float area;
 	BVHnode() {
 		left = nullptr;
 		right = nullptr;
 		aabb = BoundingBox();
 		obj = nullptr;
+		area = 0;
 	}
 };
 
@@ -31,6 +33,7 @@ public:
 			node->right = nullptr;
 			node->obj = objList[0];
 			node->aabb = objList[0]->getBoundingBox();
+			node->area = objList[0]->getArea();
 			return node;
 		}
 		else if (objList.size() == 2) {
@@ -40,16 +43,18 @@ public:
 			leftNode->right = nullptr;
 			leftNode->obj = objList[0];
 			leftNode->aabb = objList[0]->getBoundingBox();
+			leftNode->area = objList[0]->getArea();
 
 			rightNode->left = nullptr;
 			rightNode->right = nullptr;
 			rightNode->obj = objList[1];
 			rightNode->aabb = objList[1]->getBoundingBox();
+			rightNode->area = objList[1]->getArea();
 
 			node->left = leftNode;
 			node->right = rightNode;
 			node->aabb = leftNode->aabb.Union(rightNode->aabb);
-
+			node->area = leftNode->area + rightNode->area;
 			return node;
 		}
 		else {
@@ -86,6 +91,7 @@ public:
 			node->right = recursivelyBuildBVH(rightObjList);
 
 			node->aabb = node->left->aabb.Union(node->right->aabb);
+			node->area = node->left->area + node->right->area;
 		}
 		return node;
 	}
@@ -104,5 +110,22 @@ public:
 		Intersection hit2 = intersect(node->right, ori, dir);
 		if (hit1.distance < hit2.distance) return hit1;
 		else return hit2;
+	}
+	void getSample(Intersection& inter, float& pdf) {
+
+		if (!root)
+			return;
+		sample(root, inter, pdf);
+		pdf = 1.0f / root->area;
+	}
+	void sample(BVHnode* node, Intersection& inter, float& pdf) {
+		if (node->left == nullptr && node->right == nullptr) {
+			node->obj->sample(inter, pdf);
+			return;
+		}
+		float prob = getRandomNum();
+		if ((prob * node->area) > node->left->area) 
+			sample(node->left, inter, pdf);
+		else sample(node->right, inter, pdf);
 	}
 };

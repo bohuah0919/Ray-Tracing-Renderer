@@ -1,9 +1,10 @@
 #include <iostream>
-#include"MeshTriangle.hpp"
-#include"Scene.hpp"
-#include<algorithm>
+#include "MeshTriangle.hpp"
+#include "Scene.hpp"
+#include <algorithm>
 #include <fstream>
-
+#include <thread>
+#include <mutex>
 void Render(Scene& scene)
 {
     std::vector<Eigen::Vector3f> framebuffer(scene.width * scene.height);
@@ -11,28 +12,40 @@ void Render(Scene& scene)
     float scale = tan((scene.fov * 0.5) * PI / 180.0);
     float imageAspectRatio = scene.width / (float)scene.height;
     Eigen::Vector3f eye_pos(278.0f, 273.0f, -800.0f);
-    int m = 0;
+    std::mutex mtx;
+    int process = 0;
 
     int sampleNum = 16;
-    
-    for (int j = 0; j < scene.height; ++j) {
-        for (int i = 0; i < scene.width; ++i) {
-            
-            float x = (2.0f * (i + 0.5f) / (float)scene.width - 1) *
-                imageAspectRatio * scale;
-            float y = (1.0f - 2.0f * (j + 0.5f) / (float)scene.height) * scale;
+    int threadNum = 4;
+    std::vector<std::thread> threads(threadNum);
+    int threadSize = scene.height / threadNum;
+    auto generateRay = [&](int threadBegin, int threadEnd) {
+        for (int j = threadBegin; j < threadEnd; ++j) {
+            for (int i = 0; i < scene.width; ++i) {
 
-            Eigen::Vector3f dir = Eigen::Vector3f(-x, y, 1.0f).normalized();
-            for (int k = 0; k < sampleNum; k++) {
-                framebuffer[m] += scene.castRay(eye_pos, dir) / sampleNum;
+                float x = (2.0f * (i + 0.5f) / (float)scene.width - 1) *
+                    imageAspectRatio * scale;
+                float y = (1.0f - 2.0f * (j + 0.5f) / (float)scene.height) * scale;
 
+                Eigen::Vector3f dir = Eigen::Vector3f(-x, y, 1.0f).normalized();
+                for (int k = 0; k < sampleNum; k++) {
+                    framebuffer[j * scene.height + i] += scene.castRay(eye_pos, dir) / sampleNum;
+                }
             }
-
-            m++;
+            mtx.lock();
+            process++;
+            std::cout << process * 100 / scene.height << "% \n\n";
+            mtx.unlock();
         }
-        std::cout << j*100 / scene.height << "% \n\n";
+    };
+    for (int t = 0; t < threadNum; t++) {
+        threads[t] = std::thread(generateRay, t * threadSize, (t + 1) * threadSize);
     }
-
+    for (int t = 0; t < threadNum; t++) {
+        threads[t].join();
+    }
+ 
+    
     FILE* fp = fopen("D:/cornellbox.ppm", "wb");
     (void)fprintf(fp, "P6\n%d %d\n255\n", scene.width, scene.height);
     for (auto i = 0; i < scene.height * scene.width; ++i) {
@@ -45,17 +58,7 @@ void Render(Scene& scene)
     fclose(fp);
 }
 
-void printAABB(BVHnode* node) {
-    std::cout << node->aabb.Vmax << "\n";
-    std::cout << node->aabb.Vmin << "\n\n";
 
-    if (node->obj) {
-        return;
-    }
-        
-    printAABB(node->left);
-    printAABB(node->right);
-}
 int main(int argc, char** argv) {
     Material* red = new Material(DIFFUSE, Eigen::Vector3f(0.0f, 0.0f, 0.0f));
     red->abd = Eigen::Vector3f(0.63f, 0.065f, 0.05f);

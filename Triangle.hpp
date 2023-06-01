@@ -40,7 +40,7 @@ public:
 		Eigen::Vector3f S = ori - Eigen::Vector3f(vertex[0].x(), vertex[0].y(), vertex[0].z());
 		Eigen::Vector3f S1 = dir.cross(E2);
 		Eigen::Vector3f S2 = S.cross(E1);
-		if (fabs(S1.dot(E1)) < 0.01)
+		if (fabs(S1.dot(E1)) < 0.0000001f)
 			return inter;
 		float deno = 1.0f / S1.dot(E1);
 		float tnear = deno * S2.dot(E2);
@@ -54,7 +54,7 @@ public:
 			inter.obj = this;
 			inter.normal = (1 - b1 - b2) * normal[0] + b1 * normal[1] + b2 * normal[2];
 			inter.material = this->material;
-			//std::cout << normal[0] << "\n\n";
+
 		}
 		return inter;
 	}
@@ -70,6 +70,7 @@ public:
 		inter.material = this->material;
 		inter.pos = v0 * (1 - rand1 - rand2) + v1 * rand1 + v2 * rand2;
 		inter.normal = (normal[0] * (1 - rand1 - rand2) + normal[1] * rand1 + normal[2] * rand2).normalized();
+		
 	}
 private:
 	Material* material;

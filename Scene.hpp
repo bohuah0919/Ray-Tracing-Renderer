@@ -52,8 +52,8 @@ public:
         Eigen::Vector3f L_dir = Eigen::Vector3f(0.0f, 0.0f, 0.0f);
 
         Intersection block_inter = getIntersection(p, ws);
-        if (block_inter.hitHappened && block_inter.obj->isLight())
-            L_dir = emit.cwiseProduct(p_inter.material->eval(wo, ws, N)) * std::max(ws.dot(N),0.0f) * abs(- ws.dot(light_normal)) / ((x - p).norm() * (x - p).norm()) / pdf_light;
+        if (abs(block_inter.distance- (x - p).norm())<0.00001f)
+            L_dir = emit.cwiseProduct(p_inter.material->eval(wo, ws, N)) * std::max(ws.dot(N),0.0f) * std::max(- ws.dot(light_normal),0.0f) / ((x - p).norm() * (x - p).norm()) / pdf_light;
         if (p_inter.obj->isLight())
             L_dir = emit;
 

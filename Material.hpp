@@ -79,7 +79,7 @@ public:
 
 	float uniformPDF(Eigen::Vector3f wi, Eigen::Vector3f wo, Eigen::Vector3f N) {
 		if (wo.dot(N) > 0)
-			return 1.0f / (2.0f * PI);
+			return 0.5f / PI;
 		else
 			return 1.0f;
 	}

@@ -77,17 +77,7 @@ public:
 	}
 	BVH* MeshBVH;
 	void sample(Intersection& inter, float& pdf) {
-		float p = getRandomNum();
-		float area_sum = 0;
-		for (auto t : triangleList) {
-			area_sum += t->getArea();
-			if (area_sum >= p * area) {
-				t->sample(inter, pdf);
-				pdf = 1.0f / area;
-				break;
-			}
-		}
-
+		if (MeshBVH) MeshBVH->getSample(inter, pdf);
 	}
 private:
 	Material* material;

@@ -40,7 +40,7 @@ public:
         if (!p_inter.hitHappened) return Eigen::Vector3f(0.0f, 0.0f, 0.0f);
         if (p_inter.obj->isLight())
             return p_inter.material->emit;
-        //L_dir = emit;
+
         Eigen::Vector3f p = p_inter.pos;
         Eigen::Vector3f N = p_inter.normal;
         Eigen::Vector3f wo = dir;

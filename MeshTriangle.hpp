@@ -77,7 +77,9 @@ public:
 	}
 	BVH* MeshBVH;
 	void sample(Intersection& inter, float& pdf) {
-		if (MeshBVH) MeshBVH->getSample(inter, pdf);
+		if (MeshBVH) 
+			MeshBVH->getSample(inter, pdf);
+
 	}
 private:
 	Material* material;

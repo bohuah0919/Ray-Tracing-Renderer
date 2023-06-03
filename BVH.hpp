@@ -124,8 +124,9 @@ public:
 			return;
 		}
 		float prob = getRandomNum();
-		if ((prob * node->area) > node->left->area) 
+		if (prob * (node->area) > node->left->area) 
 			sample(node->left, inter, pdf);
 		else sample(node->right, inter, pdf);
 	}
+
 };

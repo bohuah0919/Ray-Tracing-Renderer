@@ -14,7 +14,6 @@ public:
 	Eigen::Vector3f Vmin;
     
 	bool intersect(Eigen::Vector3f ori, Eigen::Vector3f dir) {
-        float eps = 0.000001f;
         Eigen::Vector3f invDir = Eigen::Vector3f(1.0f / dir.x(), 1.0f / dir.y(), 1.0f / dir.z());
         Eigen::Vector3f t_min;
         Eigen::Vector3f t_max;

@@ -15,7 +15,7 @@ void Render(Scene& scene)
     std::mutex mtx;
     int process = 0;
 
-    int sampleNum = 16;
+    int sampleNum = 32;
     int threadNum = 4;
     std::vector<std::thread> threads(threadNum);
     int threadSize = scene.height / threadNum;
@@ -76,7 +76,7 @@ int main(int argc, char** argv) {
     MeshTriangle tallbox("D:/assignment7/models/cornellbox/tallbox.obj", false, false, white);
     MeshTriangle light("D:/assignment7/models/cornellbox/light.obj", false, false, lumin);
 
-    Scene scene(1024, 1024);
+    Scene scene(768, 768);
     scene.addObj(&floor);
     scene.addObj(&left);
     scene.addObj(&right);

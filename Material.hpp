@@ -15,7 +15,7 @@ public:
 	Eigen::Vector3f abd;
 	Eigen::Vector3f emit;
 	bool luminuous() {
-		if (emit.norm() > 0.001)
+		if (emit.norm() > 0.00001f)
 			return true;
 		else return false;
 	}
@@ -26,8 +26,6 @@ public:
 			if (wo.dot(N) > 0.0f) return abd / PI;
 			else return Eigen::Vector3f(0.0f, 0.0f, 0.0f);
 			break;
-		default:
-			break;
 		}
 	}
 
@@ -36,9 +34,6 @@ public:
 		{
 		case DIFFUSE:
 			return evalDiffuse(wi, wo, N);
-			break;
-
-		default:
 			break;
 		}
 	
@@ -49,21 +44,22 @@ public:
 		float rand2 = getRandomNum();
 
 		float phi = 2 * PI * rand2;
-		float z = std::sqrt(1.0f - rand1 * rand1);
-		float x = rand1 * cos(phi);
-		float y = rand1 * sin(phi);
+		float z = std::fabs(1.0f - 2.0f * rand1);
+		float r = std::sqrt(1.0f - z * z);
+		float x = r * cos(phi);
+		float y = r * sin(phi);
 		return Eigen::Vector3f(x, y, z);
 	}
 
 	Eigen::Vector3f localToWorld(Eigen::Vector3f localDir, Eigen::Vector3f N) {
 		Eigen::Vector3f T, B;
 		if ((N.x() * N.x() + N.z() * N.z()) > 0) {
-			float inv = 1.0f / (N.x() * N.x() + N.z() * N.z());
+			float inv = 1.0f / std::sqrt(N.x() * N.x() + N.z() * N.z());
 			T = inv * Eigen::Vector3f(N.z(), 0.0f, -N.x());
 			B = N.cross(T);
 		}
 		else {
-			float inv = 1.0f / (N.y() * N.y() + N.z() * N.z());
+			float inv = 1.0f / std::sqrt(N.y() * N.y() + N.z() * N.z());
 			T = inv * Eigen::Vector3f(0.0f, N.z(), -N.y());
 			B = N.cross(T);
 		}

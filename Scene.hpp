@@ -20,7 +20,7 @@ public:
     void sampleLight(Intersection& inter, float& pdf) {
         float totalArea = 0;
         float area_sum = 0;
-        float p = getRandomNum();
+        float p = getRandomFloat();
         for (auto obj : objList) {
             if (obj->isLight()) totalArea += obj->getArea();
         }
@@ -43,7 +43,7 @@ public:
 
         Eigen::Vector3f p = p_inter.pos;
         Eigen::Vector3f N = p_inter.normal;
-        Eigen::Vector3f wo = dir;
+        Eigen::Vector3f wo = -dir;
 
         Intersection inter_light;
         float pdf_light;
@@ -55,19 +55,26 @@ public:
         Eigen::Vector3f L_dir = Eigen::Vector3f(0.0f, 0.0f, 0.0f);
 
         Intersection block_inter = getIntersection(p + 0.00001f * N, ws);
-        if (fabs(block_inter.distance - (x - p).norm())<0.001f)
+        if (p_inter.material->mType == SPECULAR) L_dir = Eigen::Vector3f(0.0f, 0.0f, 0.0f);
+        else if (fabs(block_inter.distance - (x - p).norm())<0.001f)
             L_dir = emit.cwiseProduct(p_inter.material->eval(wo, ws, N)) * std::max(ws.dot(N),0.0f) * std::max(-ws.dot(light_normal),0.0f) / ((x - p).norm() * (x - p).norm()) / pdf_light;
-     
+
         Eigen::Vector3f L_indir = Eigen::Vector3f(0.0f, 0.0f, 0.0f);
-        float prob = getRandomNum();
+        float prob = getRandomFloat();
         if (prob > 0.8f) return L_dir + L_indir;
-        Eigen::Vector3f wi = p_inter.material->sampleDir(N);
+        Eigen::Vector3f wi = p_inter.material->sampleDir(wo, N);
 
         Intersection obj_inter = getIntersection(p + 0.00001f * N, wi);
+        if (obj_inter.hitHappened && p_inter.material->mType == SPECULAR)
+            return castRay(p + 0.00001f * N, wi).cwiseProduct(p_inter.material->eval(wo, wi, N)) * std::max(wi.dot(N), 0.0f) / p_inter.material->PDF(wo, wi, N) / 0.8f;
         if (obj_inter.hitHappened && !obj_inter.obj->isLight())
-            L_indir = castRay(p + 0.00001f * N, wi).cwiseProduct(p_inter.material->eval(wo, wi, N)) * std::max(wi.dot(N),0.0f) / p_inter.material->uniformPDF(wo, wi, N) / 0.8f;
+            L_indir = castRay(p + 0.00001f * N, wi).cwiseProduct(p_inter.material->eval(wo, wi, N)) * std::max(wi.dot(N),0.0f) / p_inter.material->PDF(wo, wi, N) / 0.8f;  
 
-        return L_dir + L_indir;
+        Eigen::Vector3f color =  L_dir + L_indir;
+        color(0) = std::max(0.0f, std::min(1.0f, color.x()));
+        color(1) = std::max(0.0f, std::min(1.0f, color.y()));
+        color(2) = std::max(0.0f, std::min(1.0f, color.z()));
+        return color;
 
     }
 	

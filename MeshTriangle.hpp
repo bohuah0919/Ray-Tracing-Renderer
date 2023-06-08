@@ -75,13 +75,14 @@ public:
 		}
 		return inter;
 	}
-	BVH* MeshBVH;
+	
 	void sample(Intersection& inter, float& pdf) {
 		if (MeshBVH) 
 			MeshBVH->getSample(inter, pdf);
 
 	}
 private:
+	BVH* MeshBVH;
 	Material* material;
 	Eigen::Vector3f Vmax, Vmin;
 	BoundingBox aabb;

@@ -18,7 +18,6 @@ public:
 	bool hitHappened;
 	Eigen::Vector3f pos;
 	Eigen::Vector3f normal;
-	//Eigen::Vector3f emit;
 	//Eigen::Vector2f uv;
 	Material* material;
 };

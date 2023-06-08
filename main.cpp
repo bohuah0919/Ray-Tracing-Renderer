@@ -1,6 +1,7 @@
 #include <iostream>
 #include "MeshTriangle.hpp"
 #include "Scene.hpp"
+#include "Sphere.hpp"
 #include <algorithm>
 #include <fstream>
 #include <thread>
@@ -15,7 +16,7 @@ void Render(Scene& scene)
     std::mutex mtx;
     int process = 0;
 
-    int sampleNum = 32;
+    int sampleNum = 4;
     int threadNum = 4;
     std::vector<std::thread> threads(threadNum);
     int threadSize = scene.height / threadNum;
@@ -61,27 +62,35 @@ void Render(Scene& scene)
 
 int main(int argc, char** argv) {
     Material* red = new Material(DIFFUSE, Eigen::Vector3f(0.0f, 0.0f, 0.0f));
-    red->abd = Eigen::Vector3f(0.63f, 0.065f, 0.05f);
+    red->albedo = Eigen::Vector3f(0.63f, 0.065f, 0.05f);
     Material* green = new Material(DIFFUSE, Eigen::Vector3f(0.0f, 0.0f, 0.0f));
-    green->abd = Eigen::Vector3f(0.14f, 0.45f, 0.091f);
+    green->albedo = Eigen::Vector3f(0.14f, 0.45f, 0.091f);
     Material* white = new Material(DIFFUSE, Eigen::Vector3f(0.0f, 0.0f, 0.0f));
-    white->abd = Eigen::Vector3f(0.725f, 0.71f, 0.68f);
+    white->albedo = Eigen::Vector3f(0.725f, 0.71f, 0.68f);
     Material* lumin = new Material(DIFFUSE, (8.0f * Eigen::Vector3f(0.747f + 0.058f, 0.747f + 0.258f, 0.747f) + 15.6f * Eigen::Vector3f(0.740f + 0.287f, 0.740f + 0.160f, 0.740f) + 18.4f * Eigen::Vector3f(0.737f + 0.642f, 0.737f + 0.159f, 0.737f)));
-    lumin->abd = Eigen::Vector3f(0.65f, 0.65f, 0.65f);
+    lumin->albedo = Eigen::Vector3f(0.65f, 0.65f, 0.65f);
+    Material* specular = new Material(SPECULAR, Eigen::Vector3f(0.0f, 0.0f, 0.0f));
+    specular->ior = 25;
+    Material* microfacet = new Material(MICROFACET, Eigen::Vector3f(0.0f, 0.0f, 0.0f));
+    microfacet->albedo = Eigen::Vector3f(0.725f, 0.71f, 0.68f);
+    microfacet->ior = 1.5;
+    microfacet->roughness = 0.25;
 
-    MeshTriangle floor("D:/assignment7/models/cornellbox/floor.obj",false,false, white);
-    MeshTriangle left("D:/assignment7/models/cornellbox/left.obj", false, false, red);
-    MeshTriangle right("D:/assignment7/models/cornellbox/right.obj", false, false, green);
-    MeshTriangle shortbox("D:/assignment7/models/cornellbox/shortbox.obj", false, false, white);
-    MeshTriangle tallbox("D:/assignment7/models/cornellbox/tallbox.obj", false, false, white);
-    MeshTriangle light("D:/assignment7/models/cornellbox/light.obj", false, false, lumin);
+    MeshTriangle floor("D:/ray tracing/models/cornellbox/floor.obj",false,false, white);
+    MeshTriangle left("D:/ray tracing/models/cornellbox/left.obj", false, false, red);
+    MeshTriangle right("D:/ray tracing/models/cornellbox/right.obj", false, false, green);
+    MeshTriangle shortbox("D:/ray tracing/models/cornellbox/shortbox.obj", false, false, white);
+    MeshTriangle tallbox("D:/ray tracing/models/cornellbox/tallbox.obj", false, false, specular);
+    MeshTriangle light("D:/ray tracing/models/cornellbox/light.obj", false, false, lumin);
+    Sphere sphere(Eigen::Vector3f(400.0f, 100.0f, 255.0f), 100, microfacet);
 
-    Scene scene(768, 768);
+    Scene scene(512, 512);
     scene.addObj(&floor);
     scene.addObj(&left);
     scene.addObj(&right);
-    scene.addObj(&shortbox);
-    scene.addObj(&tallbox);
+    //scene.addObj(&shortbox);
+    //scene.addObj(&tallbox);
+    scene.addObj(&sphere);
     scene.addObj(&light);
 
     scene.buildBVH();

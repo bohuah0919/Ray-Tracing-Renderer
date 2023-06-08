@@ -48,12 +48,14 @@ public:
 		float b1 = deno * S1.dot(S);
 		float b2 = deno * S2.dot(dir);
 
+		Eigen::Vector3f n = (1.0f - b1 - b2) * normal[0] + b1 * normal[1] + b2 * normal[2];
+		if (dir.dot(n) > 0) return inter;
 		if (tnear > 0.0001f && b1 >= 0 && b2 >= 0 && (1 - b1 - b2) >= 0) {
 			inter.hitHappened = true;
 			inter.pos = ori + tnear * dir;
 			inter.distance = tnear;
 			inter.obj = this;
-			inter.normal = ((1 - b1 - b2) * normal[0] + b1 * normal[1] + b2 * normal[2]).normalized();
+			inter.normal = n;
 			inter.material = this->material;
 
 		}
@@ -61,8 +63,8 @@ public:
 	}
 
 	void sample(Intersection& inter, float& pdf) {
-		float rand1 = getRandomNum();
-		float rand2 = (1.0f - rand1) * getRandomNum();
+		float rand1 = getRandomFloat();
+		float rand2 = (1.0f - rand1) * getRandomFloat();
 
 		Eigen::Vector3f v0 = Eigen::Vector3f(vertex[0].x(), vertex[0].y(), vertex[0].z());
 		Eigen::Vector3f v1 = Eigen::Vector3f(vertex[1].x(), vertex[1].y(), vertex[1].z());

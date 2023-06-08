@@ -123,7 +123,7 @@ public:
 			node->obj->sample(inter, pdf);
 			return;
 		}
-		float prob = getRandomNum();
+		float prob = getRandomFloat();
 		if (prob * (node->area) > node->left->area) 
 			sample(node->left, inter, pdf);
 		else sample(node->right, inter, pdf);

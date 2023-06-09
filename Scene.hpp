@@ -58,7 +58,7 @@ public:
         if (p_inter.material->mType == SPECULAR) L_dir = Eigen::Vector3f(0.0f, 0.0f, 0.0f);
         else if (fabs(block_inter.distance - (x - p).norm())<0.001f)
             L_dir = emit.cwiseProduct(p_inter.material->eval(wo, ws, N)) * std::max(ws.dot(N),0.0f) * std::max(-ws.dot(light_normal),0.0f) / ((x - p).norm() * (x - p).norm()) / pdf_light;
-
+        
         Eigen::Vector3f L_indir = Eigen::Vector3f(0.0f, 0.0f, 0.0f);
         float prob = getRandomFloat();
         if (prob > 0.8f) return L_dir + L_indir;

@@ -16,7 +16,7 @@ void Render(Scene& scene)
     std::mutex mtx;
     int process = 0;
 
-    int sampleNum = 4;
+    int sampleNum = 64;
     int threadNum = 4;
     std::vector<std::thread> threads(threadNum);
     int threadSize = scene.height / threadNum;
@@ -72,9 +72,9 @@ int main(int argc, char** argv) {
     Material* specular = new Material(SPECULAR, Eigen::Vector3f(0.0f, 0.0f, 0.0f));
     specular->ior = 25;
     Material* microfacet = new Material(MICROFACET, Eigen::Vector3f(0.0f, 0.0f, 0.0f));
-    microfacet->albedo = Eigen::Vector3f(0.725f, 0.71f, 0.68f);
-    microfacet->ior = 1.5;
-    microfacet->roughness = 0.25;
+    microfacet->albedo = Eigen::Vector3f(0.73f, 0.45f, 0.068f);
+    microfacet->ior = 12.5;
+    microfacet->roughness = 0.5;
 
     MeshTriangle floor("D:/ray tracing/models/cornellbox/floor.obj",false,false, white);
     MeshTriangle left("D:/ray tracing/models/cornellbox/left.obj", false, false, red);

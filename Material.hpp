@@ -38,7 +38,9 @@ public:
 			float F = fresnelSchlick(wo, H);
 			float D = GGX(H, N);
 			float G = GSmith(wo, wi, N);
-			float specular = F * G * D / (4 * OdotN * IdotN);
+			float specular;
+			if (OdotN * IdotN < 0.001f) specular = 0.0f;
+			else specular = F * G * D / (4 * OdotN * IdotN);
 			Eigen::Vector3f diffuse = (1 - F) * albedo / PI;
 			Eigen::Vector3f fr = Eigen::Vector3f(specular, specular, specular) + diffuse;
 			return fr;

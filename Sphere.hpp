@@ -23,19 +23,22 @@ public:
 		float c = (ori - center).squaredNorm() - radius * radius;
 
 		if (!solvingQuadraticEquation(a, b, c, x1, x2)) return inter;
-		if (x1 < 0.001f && x2 < 0.001f) return inter;
-		else if (x1 >= 0.01f) tnear = x1;
+		if (x1 < 0.0f && x2 < 0.0f) return inter;
+		else if (x1 >= 0) tnear = x1;
 		else tnear = x2;
 
 		Eigen::Vector3f n = (ori + tnear * dir - center).normalized();
 		if (dir.dot(n) > 0) return inter;
 
-		inter.hitHappened = true;
-		inter.pos = ori + tnear * dir;
-		inter.distance = tnear;
-		inter.obj = this;
-		inter.normal = (inter.pos-center).normalized();
-		inter.material = this->material;
+		if (tnear > 0.5f) {
+			inter.hitHappened = true;
+			inter.pos = ori + tnear * dir;
+			inter.distance = tnear;
+			inter.obj = this;
+			inter.normal = (inter.pos - center).normalized();
+			inter.material = this->material;
+		}
+		
 		return inter;
 	}
 	void sample(Intersection& inter, float& pdf) {

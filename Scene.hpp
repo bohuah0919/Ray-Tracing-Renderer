@@ -66,7 +66,7 @@ public:
 
         Intersection obj_inter = getIntersection(p + 0.00001f * N, wi);
         if (obj_inter.hitHappened && p_inter.material->mType == SPECULAR)
-            return castRay(p + 0.00001f * N, wi).cwiseProduct(p_inter.material->eval(wo, wi, N)) * std::max(wi.dot(N), 0.0f) / p_inter.material->PDF(wo, wi, N) / 0.8f;
+            return castRay(p + 0.00001f * N, wi).cwiseProduct(p_inter.material->eval(wo, wi, N)) / p_inter.material->PDF(wo, wi, N) / 0.8f;
         if (obj_inter.hitHappened && !obj_inter.obj->isLight())
             L_indir = castRay(p + 0.00001f * N, wi).cwiseProduct(p_inter.material->eval(wo, wi, N)) * std::max(wi.dot(N),0.0f) / p_inter.material->PDF(wo, wi, N) / 0.8f;  
 

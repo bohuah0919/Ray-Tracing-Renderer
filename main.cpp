@@ -82,13 +82,13 @@ int main(int argc, char** argv) {
     MeshTriangle shortbox("D:/ray tracing/models/cornellbox/shortbox.obj", false, false, white);
     MeshTriangle tallbox("D:/ray tracing/models/cornellbox/tallbox.obj", false, false, specular);
     MeshTriangle light("D:/ray tracing/models/cornellbox/light.obj", false, false, lumin);
-    Sphere sphere(Eigen::Vector3f(400.0f, 100.0f, 255.0f), 100, microfacet);
+    Sphere sphere(Eigen::Vector3f(400.0f, 100.0f, 255.0f), 100, specular);
 
     Scene scene(512, 512);
     scene.addObj(&floor);
     scene.addObj(&left);
     scene.addObj(&right);
-    //scene.addObj(&shortbox);
+    scene.addObj(&shortbox);
     //scene.addObj(&tallbox);
     scene.addObj(&sphere);
     scene.addObj(&light);
